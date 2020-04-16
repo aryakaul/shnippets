@@ -1,0 +1,16 @@
+#!/bin/bash
+
+input=$1
+full_len=$2
+
+curr_len=$(echo -n $input | wc -c)
+diff=$(echo "$full_len-$curr_len" | bc)
+if [[ $diff -lt 0 ]]; then
+    x=$(echo "$diff-3" | bc)
+    echo -e -n "${input::$x}..."
+else
+    to_add=$(echo "$diff/2" | bc) 
+    eval $(echo printf '" %0.s"' {1..$to_add})
+    echo -n $input  
+    eval $(echo printf '" %0.s"' {1..$to_add})
+fi

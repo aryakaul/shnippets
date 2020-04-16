@@ -1,0 +1,17 @@
+#!/bin/bash
+
+moon_file="$HOME/.cache/moon"
+
+[ "$(stat -c %y $moon_file | cut -d' ' -f1)" != "$(date '+%y-%m-%d')" ] && 
+    curl -s https://www.moongiant.com/phase/today > $moon_file
+
+phase="$(grep "var jArray" $moon_file | grep -o -E "(Phase: <span>)(.*)(span)" | cut -f2 -d'<' | cut -f2 -d'>')"
+[[ $phase == "Full Moon" ]] && emoji="🌝" ||
+[[ $phase == "Waning Gibbous" ]] && emoji="🌖" ||
+[[ $phase == "Last Quarter" ]] && emoji="🌗" ||
+[[ $phase == "Waning Crescent" ]] && emoji="🌘" ||
+[[ $phase == "New Moon" ]] && emoji="🌚" ||
+[[ $phase == "Waxing Crescent" ]] && emoji="🌒" ||
+[[ $phase == "First Quarter" ]] && emoji="🌓" ||
+[[ $phase == "Waxing Gibbous" ]] && emoji="🌖" 
+echo "Moon Phase: $phase $emoji"
