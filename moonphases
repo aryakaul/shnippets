@@ -2,16 +2,69 @@
 
 moon_file="$HOME/.cache/moon"
 
-[ "$(stat -c %y $moon_file | cut -d' ' -f1)" != "$(date '+%y-%m-%d')" ] && 
-    curl -s https://www.moongiant.com/phase/today > $moon_file
+dl() {
+    [ "$(stat -c %y $moon_file | cut -d' ' -f1)" != "$(date '+%y-%m-%d')" ] && 
+        curl -s https://www.moongiant.com/phase/today > $moon_file
+}
 
-phase="$(grep "var jArray" $moon_file | grep -o -E "(Phase: <span>)(.*)(span)" | cut -f2 -d'<' | cut -f2 -d'>')"
-[[ $phase == "Full Moon" ]] && emoji="🌝" ||
-[[ $phase == "Waning Gibbous" ]] && emoji="🌖" ||
-[[ $phase == "Last Quarter" ]] && emoji="🌗" ||
-[[ $phase == "Waning Crescent" ]] && emoji="🌘" ||
-[[ $phase == "New Moon" ]] && emoji="🌚" ||
-[[ $phase == "Waxing Crescent" ]] && emoji="🌒" ||
-[[ $phase == "First Quarter" ]] && emoji="🌓" ||
-[[ $phase == "Waxing Gibbous" ]] && emoji="🌖" 
-echo "Moon Phase: $phase $emoji"
+get_phase() {
+    phase="$(grep "var jArray" $moon_file | grep -o -E "(Phase: <span>)(.*)(span)" | cut -f2 -d'<' | cut -f2 -d'>')"
+    echo $phase
+}
+
+get_emoji() {
+
+    case "$1" in 
+        
+    "Full Moon")
+        emoji="🌝"
+        ;;
+        
+    "Waning Gibbous")
+        [[ $2 == "YES" ]] && emoji="🌔" || emoji="🌖"
+        ;;
+
+    "Last Quarter")
+        [[ $2 == "YES" ]] && emoji="🌓" || emoji="🌗"
+        ;;
+
+    "Waning Crescent")
+        [[ $2 == "YES" ]] && emoji="🌒" || emoji="🌘"
+        ;;
+    
+    "New Moon") 
+        emoji="🌚"
+        ;;
+
+    "Waxing Crescent")
+        [[ $2 == "YES" ]] && emoji="🌘" || emoji="🌒"
+        ;;
+    
+    "First Quarter")
+        [[ $2 == "YES" ]] && emoji="🌗" || emoji="🌓"
+        ;;
+    
+    "Waxing Gibbous")
+        [[ $2 == "YES" ]] && emoji="🌖" || emoji="🌔"
+        ;;
+    esac 
+    echo "Moon Phase: $1 $emoji"
+}
+
+main() {
+    SOUTHERN=NO
+	for i in "$@"; do
+	case $i in
+        -s|--southern)
+        SOUTHERN=YES
+        shift
+        ;;
+        *)    
+		;;
+	esac
+	done
+    dl
+    get_emoji "$(get_phase)" "$SOUTHERN"
+}
+
+main "$@"
