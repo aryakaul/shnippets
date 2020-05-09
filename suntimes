@@ -1,0 +1,36 @@
+#!/bin/bash
+# Thanks Lubos Rendek - web@linuxconfig.org!
+
+sun_file="$HOME/.cache/sun"
+
+dl() {
+    [ "$(stat -c %y $sun_file 2> /dev/null | cut -d' ' -f1)" != "$(date '+%Y-%m-%d')" ] && (curl -s "https://weather.com/weather/today/l/$1" > $sun_file;)
+}
+
+get_times() {
+    sun_times=$( cat $sun_file | sed 's/<span/\n/g' | sed 's/<\/span>/\n/g'  | grep -E "dp0-details-sunrise|dp0-details-sunset" | tr -d '\n' | sed 's/>/ /g' | cut -d " " -f 4,8 )
+    sunrise=$(date --date="`echo $sun_times | awk '{ print $1}'` AM" +%R)
+    sunset=$(date --date="`echo $sun_times | awk '{ print $2}'` PM" +%R)
+    echo "🌄 $sunrise  🌇 $sunset"
+}
+
+
+main() {
+    #obtain a location code from: https://weather.codes/search/
+	LOCATION="USCA0830" # bay area
+    #LOCATION="USMA0046" # for boston
+    for i in "$@"; do
+	case $i in
+        -l|--location)
+        LOCATION=$2
+        shift
+        shift
+        ;;
+        *)    
+		;;
+	esac
+	done
+    dl $LOCATION
+    get_times
+}
+main "#@"

@@ -3,7 +3,7 @@
 moon_file="$HOME/.cache/moon"
 
 dl() {
-    [ "$(stat -c %y $moon_file | cut -d' ' -f1)" != "$(date '+%Y-%m-%d')" ] && (curl -s https://www.moongiant.com/phase/today > $moon_file; echo "here";)
+    [ "$(stat -c %y $moon_file 2> /dev/null | cut -d' ' -f1)" != "$(date '+%Y-%m-%d')" ] && (curl -s https://www.moongiant.com/phase/$(date '+%m/%d/%y') > $moon_file;)
 }
 
 get_phase() {
@@ -47,7 +47,7 @@ get_emoji() {
         [[ $2 == "YES" ]] && emoji="🌖" || emoji="🌔"
         ;;
     esac 
-    echo "Moon Phase: $1 $emoji"
+    echo "$emoji $1"
 }
 
 main() {
@@ -63,7 +63,6 @@ main() {
 	esac
 	done
     dl
-    get_phase
     get_emoji "$(get_phase)" "$SOUTHERN"
 }
 
