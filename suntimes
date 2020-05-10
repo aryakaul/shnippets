@@ -4,7 +4,7 @@
 sun_file="$HOME/.cache/sun"
 
 dl() {
-    [ "$(stat -c %y $sun_file 2> /dev/null | cut -d' ' -f1)" != "$(date '+%Y-%m-%d')" ] && (curl -s "https://weather.com/weather/today/l/$1" > $sun_file;)
+    [ "$(stat -c %y $sun_file 2> /dev/null | cut -d' ' -f1)" != "$(date +%Y-%m-%d)" ] && curl -s "https://weather.com/weather/today/l/$1" > $sun_file
 }
 
 get_times() {
