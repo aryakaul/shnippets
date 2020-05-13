@@ -3,7 +3,7 @@
 moon_file="$HOME/.cache/moon"
 
 dl() {
-    [ -s $moon_file ] && rm "$moon_file"
+    [ -s $moon_file ] || rm "$moon_file"
     [ "$(stat -c %y $moon_file 2> /dev/null | cut -d' ' -f1)" != "$(date '+%Y-%m-%d')" ] && (curl -s https://www.moongiant.com/phase/$(date '+%m/%d/%y') > $moon_file;)
 }
 
