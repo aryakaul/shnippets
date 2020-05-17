@@ -1,15 +1,23 @@
 #!/bin/bash
 # Thanks Lubos Rendek - web@linuxconfig.org!
 
-sun_file="$HOME/.cache/sun"
+url="https://weather.com/weather/today/l"
 
-dl() {
-    [ -s $sun_file ] || rm $sun_file
-    [ "$(stat -c %y $sun_file 2> /dev/null | cut -d' ' -f1)" != "$(date +%Y-%m-%d)" ] && curl -s "https://weather.com/weather/today/l/$1" > $sun_file
+download() {
+    previous=$(find $HOME/.cache -maxdepth 0 -name "*_$1_sun")
+    curl -s "$url/$1" > $2
+    if [ -z $previous ] || [ $(diff $2 $previous) ];  then
+        rm $previous 2> /dev/null
+        sun_file=$2
+    else
+        rm $2
+        sun_file=$previous
+    fi
+    echo "$sun_file"
 }
 
 get_times() {
-    sun_times=$( cat $sun_file | sed 's/<span/\n/g' | sed 's/<\/span>/\n/g'  | grep -E "dp0-details-sunrise|dp0-details-sunset" | tr -d '\n' | sed 's/>/ /g' | cut -d " " -f 4,8 )
+    sun_times=$( cat $1 | sed 's/<span/\n/g' | sed 's/<\/span>/\n/g'  | grep -E "dp0-details-sunrise|dp0-details-sunset" | tr -d '\n' | sed 's/>/ /g' | cut -d " " -f 4,8 )
     sunrise=$(date --date="`echo $sun_times | awk '{ print $1}'` AM" +%R)
     sunset=$(date --date="`echo $sun_times | awk '{ print $2}'` PM" +%R)
     echo "🌄 $sunrise  🌇 $sunset"
@@ -31,7 +39,8 @@ main() {
 		;;
 	esac
 	done
-    dl $LOCATION
-    get_times
+    new_sun_file="$HOME/.cache/$(date '+%Y-%m-%d-%H:%M:%S')_"$LOCATION"_sun"
+    sun_file=$(download $LOCATION $new_sun_file)
+    get_times $sun_file
 }
 main "#@"

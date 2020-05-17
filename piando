@@ -1,0 +1,60 @@
+#!/bin/bash
+set -u
+set -e
+
+search() {
+    for obj in $1/*; do
+        [[ "$obj" == *$2 ]] && [[ "$3" == "NO" ]] && [[ ! -d "$obj" ]] && printf '%s\n' "$obj"
+        [[ "$obj" == *$2 ]] && [[ "$3" == "YES" ]] && [[ -d "$obj" ]] && printf '%s\n' "$obj"
+    done
+}
+
+recursive_search() {
+    shopt -s globstar
+    for obj in $1/**/*; do
+        [[ "$obj" == *$2 ]] && [[ "$3" == "NO" ]] && [[ ! -d "$obj" ]] && printf '%s\n' "$obj"
+        [[ "$obj" == *$2 ]] && [[ "$3" == "YES" ]] && [[ -d "$obj" ]] && printf '%s\n' "$obj"
+    done
+    shopt -u globstar
+}
+
+
+RECURSIVE_SEARCH=NO
+FOLDERS=NO
+EXTENSION=""
+DIR="."
+main() {
+	for i in "$@"; do
+	case $i in
+        -e|--extension)
+        EXTENSION="$2"
+        shift
+        shift
+        ;;
+		-f|--folders)
+		FOLDERS=YES
+		shift
+        ;;
+		-r|--recursive)
+		RECURSIVE_SEARCH=YES
+		shift
+		;;
+		-d|--directory)
+		DIR="$2"
+		shift
+        shift
+		;;
+        *)    
+		;;
+	esac
+	done
+    [ ! -d "$DIR" ] && die "directory doesn't exist"
+    [[ "$RECURSIVE_SEARCH" == "YES" ]] && recursive_search "$DIR" "$EXTENSION" "$FOLDERS" | shuf || search "$DIR" "$EXTENSION" "$FOLDERS" | shuf
+}
+
+die() {
+    printf 'error: %s.\n' "$1" >&2
+    exit 1
+}
+
+main "$@"
