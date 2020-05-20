@@ -3,7 +3,7 @@ set -u
 set -e
 
 search() {
-    for obj in $1/*; do
+    for obj in "$1"/*; do
         [[ "$obj" == *$2 ]] && [[ "$3" == "NO" ]] && [[ ! -d "$obj" ]] && printf '%s\n' "$obj"
         [[ "$obj" == *$2 ]] && [[ "$3" == "YES" ]] && [[ -d "$obj" ]] && printf '%s\n' "$obj"
     done
@@ -11,7 +11,7 @@ search() {
 
 recursive_search() {
     shopt -s globstar
-    for obj in $1/**/*; do
+    for obj in "$1"/**/*; do
         [[ "$obj" == *$2 ]] && [[ "$3" == "NO" ]] && [[ ! -d "$obj" ]] && printf '%s\n' "$obj"
         [[ "$obj" == *$2 ]] && [[ "$3" == "YES" ]] && [[ -d "$obj" ]] && printf '%s\n' "$obj"
     done
@@ -49,7 +49,11 @@ main() {
 	esac
 	done
     [ ! -d "$DIR" ] && die "directory doesn't exist"
-    [[ "$RECURSIVE_SEARCH" == "YES" ]] && recursive_search "$DIR" "$EXTENSION" "$FOLDERS" | shuf || search "$DIR" "$EXTENSION" "$FOLDERS" | shuf
+    if [[ "$RECURSIVE_SEARCH" == "YES" ]]; then
+        recursive_search "$DIR" "$EXTENSION" "$FOLDERS" | shuf
+    else
+        search "$DIR" "$EXTENSION" "$FOLDERS" | shuf
+    fi
 }
 
 die() {

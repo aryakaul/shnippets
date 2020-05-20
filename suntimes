@@ -4,13 +4,14 @@
 url="https://weather.com/weather/today/l"
 
 download() {
-    previous=$(find $HOME/.cache -maxdepth 0 -name "*_$1_sun")
-    curl -s "$url/$1" > $2
-    if [ -z $previous ] || [ $(diff $2 $previous) ];  then
-        rm $previous 2> /dev/null
+    previous=$(find "$HOME"/.cache -maxdepth 1 -name "*_$1-sun")
+    curl -s "$url/$1" > "$2"
+    comp=$(cmp "$2" "$previous" 2> /dev/null)
+    if [ -z "$previous" ] || [ -z "$comp" ];  then
+        rm "$previous" 2> /dev/null
         sun_file=$2
     else
-        rm $2
+        rm "$2"
         sun_file=$previous
     fi
     echo "$sun_file"
@@ -39,8 +40,8 @@ main() {
 		;;
 	esac
 	done
-    new_sun_file="$HOME/.cache/$(date '+%Y-%m-%d-%H:%M:%S')_"$LOCATION"_sun"
-    sun_file=$(download $LOCATION $new_sun_file)
-    get_times $sun_file
+    new_sun_file="$HOME/.cache/$(date '+%Y-%m-%d-%H:%M:%S')_$LOCATION-sun"
+    sun_file=$(download "$LOCATION" "$new_sun_file")
+    get_times "$sun_file"
 }
 main "#@"
