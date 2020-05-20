@@ -41,7 +41,10 @@ main() {
 	esac
 	done
     new_sun_file="$HOME/.cache/$(date '+%Y-%m-%d-%H:%M:%S')_$LOCATION-sun"
+    #echo $LOCATION
+    #download "$LOCATION" "$new_sun_file"
     sun_file=$(download "$LOCATION" "$new_sun_file")
+    #echo $sun_file
     get_times "$sun_file"
 }
-main "#@"
+main "$@"
