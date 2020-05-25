@@ -4,16 +4,24 @@
 url="https://weather.com/weather/today/l"
 
 download() {
+
+    # find old suntime file if it exists
     previous=$(find "$HOME"/.cache -maxdepth 1 -name "*_$1-sun")
+    
+    # dl a new suntime 
     curl -s "$url/$1" > "$2"
     comp=$(cmp "$2" "$previous" 2> /dev/null)
-    if [ -z "$previous" ] || [ -z "$comp" ];  then
+    
+    # check if old file is empty or if 
+    # it's the same as the new file
+    if [ -z "$previous" ] || [ ! "$comp" ];  then
         rm "$previous" 2> /dev/null
         sun_file=$2
     else
         rm "$2"
         sun_file=$previous
     fi
+
     echo "$sun_file"
 }
 
