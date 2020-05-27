@@ -26,9 +26,9 @@ download() {
 }
 
 get_times() {
-    sun_times=$( cat $1 | sed 's/<span/\n/g' | sed 's/<\/span>/\n/g'  | grep -E "dp0-details-sunrise|dp0-details-sunset" | tr -d '\n' | sed 's/>/ /g' | cut -d " " -f 4,8 )
-    sunrise=$(date --date="`echo $sun_times | awk '{ print $1}'` AM" +%R)
-    sunset=$(date --date="`echo $sun_times | awk '{ print $2}'` PM" +%R)
+    sun_times=$( cat $1 | sed 's/,/\n/g' | grep -E "sunriseTimeLocal|sunsetTimeLocal" | head -n2 | cut -d'T' -f3 | cut -d'-' -f1 | tr '\n' '\t' )
+    sunrise=$( echo $sun_times | awk '{print $1}')
+    sunset=$( echo $sun_times | awk '{print $2}')
     echo "🌄 $sunrise  🌇 $sunset"
 }
 
