@@ -27,8 +27,8 @@ download() {
 
 get_times() {
     sun_times=$( cat $1 | sed 's/,/\n/g' | grep -E "sunriseTimeLocal|sunsetTimeLocal" | head -n2 | cut -d'T' -f3 | cut -d'-' -f1 | tr '\n' '\t' )
-    sunrise=$( echo $sun_times | awk '{print $1}')
-    sunset=$( echo $sun_times | awk '{print $2}')
+    sunrise=$( echo $sun_times | awk '{print $1}' | cut -c1-5 )
+    sunset=$( echo $sun_times | awk '{print $2}' | cut -c1-5 )
     echo "🌄 $sunrise  🌇 $sunset"
 }
 
