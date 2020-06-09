@@ -9,16 +9,21 @@ download() {
     previous=$(find "$HOME"/.cache -maxdepth 1 -name "*_$1-sun")
     
     # dl a new suntime 
-    curl -s "$url/$1" > "$2"
+    timeout 3 curl -s "$url/$1" > "$2"
+    while [ ! -s "$2" ] && [ ! -s "$previous" ]; do
+        curl -s "$url/$1" > "$2"
+    done
+
     comp=$(cmp "$2" "$previous" 2> /dev/null)
     
-    # check if old file is empty or if 
-    # it's the same as the new file
-    if [ -z "$previous" ] || [ ! "$comp" ];  then
+    # check if it's the same as the new file
+    if [ ! "$comp" ] || [ ! -f $previous ];  then
         rm "$previous" 2> /dev/null
+        #echo "new"
         sun_file=$2
     else
         rm "$2"
+        #echo "old"
         sun_file=$previous
     fi
 
@@ -51,7 +56,7 @@ main() {
     new_sun_file="$HOME/.cache/$(date '+%Y-%m-%d-%H:%M:%S')_$LOCATION-sun"
     #echo $LOCATION
     #download "$LOCATION" "$new_sun_file"
-    sun_file=$(download "$LOCATION" "$new_sun_file")
+    sun_file=$(download "$LOCATION" "$new_sun_file" | tail -n1)
     #echo $sun_file
     get_times "$sun_file"
 }
