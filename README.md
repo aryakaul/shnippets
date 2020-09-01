@@ -23,7 +23,7 @@ shuffle all png files found recursively in memes directory
 ```
 shuffle all folders found recursively in music directory. play them with `mpv`
 ```
-> piando -r -d ~/music -f > .playlist; mpv --playlist=.playlist --loop-playlist
+> piando -r -d ~/music -f | mpv --playlist=- --loop-playlist
 ```
 # moonphases - 🌚
 script to generate the current moonphase
