@@ -1,0 +1,62 @@
+#!/bin/bash
+
+get_fraction() {
+    st=$(date --date "$1" +%s)
+    en=$(date --date "$2" +%s)
+    now=$(date +%s)
+  
+    total=$(( $en - $st ))
+    already_done=$(( $now - $st ))
+    passed=$(echo "$already_done * 100 / $total" | bc -l)
+    onesec=$( echo "1/$total" | bc -l )
+    #echo $passed
+}
+
+determine_auto_precision() {
+    mapfile -t full_num <<<$(echo "$onesec" | bc -l | cut -d'.' -f2 | grep -o .) 
+    for i in "${!full_num[@]}"; do
+        if [[ ${full_num[i]} -ne 0 ]]; then 
+			echo $i
+			break
+		fi
+    done
+}
+
+main() {
+    start_time=$(date +'%Y-%m-%d %H:%m:%S' -d "January 1")
+    end_time=$(date +'%Y-%m-%d %H:%m:%S' -d "January 1 next year")
+    precision="auto"
+    format="%\n"
+	for i in "$@"; do
+	case $i in
+        -s|--start)
+        start_time=$2 
+        shift
+        shift
+        ;;
+        -e|--end)
+        end_time=$2 
+        shift
+        shift
+        ;;
+        -p|--precision)
+        precision=$2 
+        shift
+        shift
+        ;;
+        -f|--format)
+        format=$2 
+        shift
+        shift
+        ;;
+        *)    
+		;;
+	esac
+	done
+	get_fraction "$start_time" "$end_time"
+    [[ $precision == "auto" ]] && precision=$(determine_auto_precision)
+	string=$(printf "%.${precision}f\n" $passed)
+	echo -e -n "${string}${format}"
+}
+
+main "$@"
