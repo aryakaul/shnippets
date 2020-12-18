@@ -9,7 +9,6 @@ get_fraction() {
     already_done=$(( $now - $st ))
     passed=$(echo "$already_done * 100 / $total" | bc -l)
     onesec=$( echo "1/$total" | bc -l )
-    #echo $passed
 }
 
 determine_auto_precision() {
