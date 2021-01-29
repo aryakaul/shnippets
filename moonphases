@@ -8,7 +8,7 @@ dl() {
 }
 
 get_phase() {
-    phase="$(grep "var jArray" $moon_file | grep -o -E "(Phase: <span>)(.*)(span)" | cut -f2 -d'<' | cut -f2 -d'>')"
+    phase="$(grep "moonDetails" $moon_file | grep -o -E "(Phase: <span>)(.*)(span)" | cut -f2 -d'<' | cut -f2 -d'>')"
     echo $phase
 }
 
